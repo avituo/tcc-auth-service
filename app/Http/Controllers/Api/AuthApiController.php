@@ -3,19 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IssueTokenRequest;
 use App\Models\User;
 use Firebase\JWT\JWT;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthApiController extends Controller
 {
-    public function token(Request $request)
+    public function token(IssueTokenRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+        $data = $request->validated();
 
         $user = User::where('email', $data['email'])->first();
 
@@ -26,19 +25,29 @@ class AuthApiController extends Controller
         }
 
         $now = time();
-        $ttl = (int) config('auth.jwt_ttl_minutes');
+        $ttl = (int) config('jwt.ttl_minutes');
+        $secret = (string) config('jwt.secret');
+
+        if (strlen($secret) < 32) {
+            abort(500, 'JWT signing key is not configured securely.');
+        }
 
         $payload = [
-            'iss' => config('app.name'),
+            'iss' => config('jwt.issuer'),
+            'aud' => config('jwt.audience'),
             'sub' => (string) $user->id,
-            'roles' => ['user'],
+            'email' => $user->email,
+            'name' => $user->name,
+            'roles' => $user->roles ?? ['user'],
+            'jti' => (string) Str::uuid(),
             'iat' => $now,
+            'nbf' => $now,
             'exp' => $now + ($ttl * 60),
         ];
 
         $token = JWT::encode(
             $payload,
-            config('auth.jwt_secret'),
+            $secret,
             'HS256'
         );
 

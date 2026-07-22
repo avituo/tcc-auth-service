@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,6 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Product::factory(1000)->create();
+        User::factory()->create([
+            'name' => 'TCC Administrator',
+            'email' => 'admin@example.com',
+            'roles' => ['admin'],
+        ]);
     }
 }

@@ -114,12 +114,4 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
-    /*
-    |--------------------------------------------------------------------------
-    | JWT Configuration
-    |--------------------------------------------------------------------------
-    */
-
-    'jwt_secret' => env('JWT_SECRET', ''),
-    'jwt_ttl_minutes' => env('JWT_TTL_MINUTES', 60),
 ];
