@@ -33,7 +33,7 @@ class AuthTokenTest extends TestCase
             'roles' => ['admin', 'user'],
         ]);
 
-        $response = $this->postJson('/api/auth/token', [
+        $response = $this->postJson('/api/v1/auth/token', [
             'email' => $user->email,
             'password' => 'correct-password',
         ]);
@@ -59,13 +59,13 @@ class AuthTokenTest extends TestCase
     {
         User::factory()->create(['email' => 'ada@example.test']);
 
-        $this->postJson('/api/auth/token', [
+        $this->postJson('/api/v1/auth/token', [
             'email' => 'ada@example.test',
             'password' => 'wrong-password',
         ])->assertUnauthorized()
             ->assertExactJson(['message' => 'Invalid credentials']);
 
-        $this->postJson('/api/auth/token', [
+        $this->postJson('/api/v1/auth/token', [
             'email' => 'missing@example.test',
             'password' => 'wrong-password',
         ])->assertUnauthorized()
@@ -74,7 +74,7 @@ class AuthTokenTest extends TestCase
 
     public function test_it_validates_the_token_request(): void
     {
-        $this->postJson('/api/auth/token', [])
+        $this->postJson('/api/v1/auth/token', [])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['email', 'password']);
     }
@@ -82,13 +82,13 @@ class AuthTokenTest extends TestCase
     public function test_it_throttles_repeated_login_attempts(): void
     {
         for ($attempt = 0; $attempt < 5; $attempt++) {
-            $this->postJson('/api/auth/token', [
+            $this->postJson('/api/v1/auth/token', [
                 'email' => 'attacker@example.test',
                 'password' => 'wrong-password',
             ])->assertUnauthorized();
         }
 
-        $this->postJson('/api/auth/token', [
+        $this->postJson('/api/v1/auth/token', [
             'email' => 'attacker@example.test',
             'password' => 'wrong-password',
         ])->assertTooManyRequests();

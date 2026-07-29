@@ -5,6 +5,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
     Route::post('/auth/token', [TokenController::class, 'store'])
-        ->middleware('throttle:auth-token');
-
+        ->middleware('throttle:auth-token')
+        ->name('auth.token.store');
 });
