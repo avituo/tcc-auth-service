@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\IssueTokenRequest;
+use App\Http\Requests\Api\V1\IssueTokenRequest;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class AuthApiController extends Controller
+class TokenController extends Controller
 {
-    public function token(IssueTokenRequest $request): JsonResponse
+    public function store(IssueTokenRequest $request): JsonResponse
     {
         $data = $request->validated();
-
-        $user = User::where('email', $data['email'])->first();
+        $user = User::query()->where('email', $data['email'])->first();
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
             return response()->json([
